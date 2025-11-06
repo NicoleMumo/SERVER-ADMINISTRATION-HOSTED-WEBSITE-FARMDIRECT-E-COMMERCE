@@ -52,7 +52,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 import FarmerLayout from "../../layouts/FarmerLayout";
 
-const API_BASE_URL = "http://localhost:5000";
+// Use environment variable for API URL (set in .env file)
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 // --- Dashboard Tile Configuration ---
 // Define default order and visibility for tiles

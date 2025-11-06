@@ -28,7 +28,8 @@ import {
 } from "recharts";
 import FarmerLayout from "../../layouts/FarmerLayout";
 
-const API_BASE_URL = "http://localhost:5000";
+// Use environment variable for API URL (set in .env file)
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const Analytics = () => {
   const [summary, setSummary] = useState(null);

@@ -60,8 +60,8 @@ const theme = createTheme({
   },
 });
 
-// Configure axios defaults
-axios.defaults.baseURL = 'http://localhost:5000'; // adjust this to match your server URL
+// Configure axios defaults - use environment variable for deployment
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // Axios interceptor configuration
 axios.interceptors.request.use(

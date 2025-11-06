@@ -26,7 +26,8 @@ import {
 } from "@mui/icons-material";
 import FarmerLayout from "../../layouts/FarmerLayout";
 
-const API_BASE_URL = "http://localhost:5000/api";
+// Use environment variable for API URL (set in .env file)
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 const EditProductForm = () => {
   const navigate = useNavigate();
@@ -61,7 +62,7 @@ const EditProductForm = () => {
 
         // Fetch categories first
         const categoriesResponse = await axios.get(
-          `${API_BASE_URL}/categories`,
+          `${API_BASE_URL}/api/categories`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -70,7 +71,7 @@ const EditProductForm = () => {
 
         // Fetch product data
         const productResponse = await axios.get(
-          `${API_BASE_URL}/products/${productId}`,
+          `${API_BASE_URL}/api/products/${productId}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -180,7 +181,7 @@ const EditProductForm = () => {
       const token = localStorage.getItem("token");
       const response = await axios.patch(
         // Always PATCH for edit form
-        `${API_BASE_URL}/products/${productId}`,
+        `${API_BASE_URL}/api/products/${productId}`,
         formData,
         {
           headers: {

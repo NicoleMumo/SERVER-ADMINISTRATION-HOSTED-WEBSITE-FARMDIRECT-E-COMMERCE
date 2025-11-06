@@ -22,18 +22,30 @@ dotenv.config({ path: "../.env" });
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Configure CORS with specific options
+// Configure CORS with explicit whitelist and proper preflight handling
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:3000",
+];
+
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_URL // Use environment variable in production
-        : "http://localhost:3000", // Allow React dev server in development
-    credentials: true, // Allow cookies if you're using them
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // allow non-browser clients
+      if (allowedOrigins.filter(Boolean).includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204,
   })
 );
+
+// Ensure preflight requests are handled
+app.options("*", cors());
 
 app.use(express.json());
 
@@ -56,6 +68,9 @@ app.use("/api", authRoutes); // Mount user endpoints at /api/users
 app.get("/", (req, res) => {
   res.send("FarmDirect Backend API is running!");
 });
+
+// Health check for Render
+app.get("/healthz", (req, res) => res.send("ok"));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

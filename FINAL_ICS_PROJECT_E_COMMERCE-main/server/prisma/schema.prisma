@@ -1,0 +1,127 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String?  @unique
+  phone     String?  @unique
+  password  String?
+  role      Role     @default(CONSUMER)
+  farmName  String?
+  location  String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+  cart      Cart?
+  otps      OTP[]
+  products  Product[] @relation("FarmerProducts")
+  balance   Float     @default(0)
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String
+  price       Float
+  stock       Int
+  imageUrl    String?
+  category    Category @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  farmer      User     @relation("FarmerProducts", fields: [farmerId], references: [id])
+  farmerId    Int
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  unit      String    // New field for unit (e.g., kg, litre, piece, etc.)
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  user      User        @relation(fields: [userId], references: [id])
+  userId    Int
+  items     OrderItem[]
+  status    OrderStatus @default(PENDING)
+  total     Float
+  pesapalTrackingId String?
+  shippingAddress String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  code      String
+  phone     String
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  used      Boolean  @default(false)
+}
+
+enum Role {
+  FARMER
+  CONSUMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED 
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}

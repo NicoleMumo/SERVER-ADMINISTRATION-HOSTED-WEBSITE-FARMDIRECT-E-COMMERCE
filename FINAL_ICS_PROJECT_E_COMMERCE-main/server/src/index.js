@@ -23,29 +23,51 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Configure CORS with explicit whitelist and proper preflight handling
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "http://localhost:3000",
-];
+// Supports comma-separated list via FRONTEND_URLS, or single FRONTEND_URL
+const allowedOrigins = (
+  (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+).concat(["http://localhost:3000"]);
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true); // allow non-browser clients
-      if (allowedOrigins.filter(Boolean).includes(origin)) {
-        return callback(null, true);
-      }
+      if (allowedOrigins.includes(origin)) return callback(null, true);
       return callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Content-Type"],
     optionsSuccessStatus: 204,
+    maxAge: 86400,
   })
 );
 
-// Ensure preflight requests are handled
-app.options("*", cors());
+// Ensure preflight requests are handled and return valid headers
+app.options("*", (req, res) => {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+    );
+    const reqHeaders = req.headers["access-control-request-headers"];
+    res.header(
+      "Access-Control-Allow-Headers",
+      reqHeaders || "Content-Type, Authorization"
+    );
+    res.header("Access-Control-Max-Age", "86400");
+    return res.sendStatus(204);
+  }
+  return res.sendStatus(403);
+});
 
 app.use(express.json());
 

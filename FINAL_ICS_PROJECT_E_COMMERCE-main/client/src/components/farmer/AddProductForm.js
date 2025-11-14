@@ -133,7 +133,7 @@ const AddProductForm = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.post(`${API_BASE_URL}/products`, formData, {
+      await axios.post(`${API_BASE_URL}/api/products`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

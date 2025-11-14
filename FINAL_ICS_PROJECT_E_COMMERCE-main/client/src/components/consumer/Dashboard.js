@@ -249,8 +249,30 @@ const ConsumerDashboard = () => {
       if (!storedUser) throw new Error('User not logged in');
       const userObj = JSON.parse(storedUser);
       const userId = userObj.id;
+      
+      // Validate shipping address
+      if (!shippingAddress || shippingAddress.trim() === '') {
+        setCheckoutStatus('error');
+        setCheckoutMessage('Please add a shipping address in your profile before checkout.');
+        setCheckoutLoading(false);
+        return;
+      }
+      
+      // Validate cart is not empty
+      if (cart.length === 0) {
+        setCheckoutStatus('error');
+        setCheckoutMessage('Your cart is empty.');
+        setCheckoutLoading(false);
+        return;
+      }
+      
       const items = cart.map(item => ({ productId: item.id, quantity: item.quantity }));
-      const res = await axios.post('http://localhost:5000/api/orders', { userId, items, shippingAddress });
+      const token = localStorage.getItem('token');
+      const res = await axios.post('/api/orders', { userId, items, shippingAddress }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       setCheckoutStatus('pending');
       setCheckoutMessage('STK push sent! Please complete payment on your phone.');
       setTimeout(async () => {
@@ -261,13 +283,17 @@ const ConsumerDashboard = () => {
         await fetchProducts(); // Refresh products after successful checkout
       }, 4000);
     } catch (err) {
+      console.error('Checkout error:', err);
       if (err.response?.data?.message && err.response.data.message.includes('outdated')) {
         setCheckoutStatus('error');
         setCheckoutMessage(err.response.data.message);
         await fetchProducts(); // Refresh products if stock is outdated
+      } else if (err.response?.data?.message && err.response.data.message.includes('Shipping address')) {
+        setCheckoutStatus('error');
+        setCheckoutMessage(err.response.data.message);
       } else {
         setCheckoutStatus('error');
-        setCheckoutMessage(err.response?.data?.message || 'Checkout failed.');
+        setCheckoutMessage(err.response?.data?.message || 'Checkout failed. Please try again.');
       }
     } finally {
       setCheckoutLoading(false);

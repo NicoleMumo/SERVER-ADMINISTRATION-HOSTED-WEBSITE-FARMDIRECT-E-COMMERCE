@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Typography, Grid, Paper, AppBar, Toolbar, Link, Container, Divider } from '@mui/material';
 import { School, Favorite, LocalShipping, CheckCircleOutline, Nature, Spa, Person, Facebook, Twitter, Instagram, LinkedIn, Phone, Email, LocationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import HeroImage from '../assets/Hero.jpeg';
+import HeroImage from '../assets/Hero.jpg';
 
 const Home = () => {
   const navigate = useNavigate();

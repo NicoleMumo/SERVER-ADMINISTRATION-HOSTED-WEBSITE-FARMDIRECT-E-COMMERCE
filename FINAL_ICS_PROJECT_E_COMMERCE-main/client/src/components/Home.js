@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, Typography, Grid, Paper, AppBar, Toolbar, Link, Container, Divider } from '@mui/material';
 import { School, Favorite, LocalShipping, CheckCircleOutline, Nature, Spa, Person, Facebook, Twitter, Instagram, LinkedIn, Phone, Email, LocationOn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import HeroImage from '../assets/Hero.jpg';
+import HeroImage from '../assets/Hero.jpeg';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -162,7 +162,7 @@ const Home = () => {
           },
         }}
       >
-        <Box sx={{ position: 'relative', zIndex: 1, pt: 24, pb: 12 }}>
+        <Box sx={{ position: 'relative', zIndex: 1, py: 12 }}>
           <Typography variant="h2" component="h1" sx={{ fontWeight: 'bold', color: '#FFFFFF', mb: 2 }}>
             Fresh From Our Farms, Straight to Your Table
           </Typography>

@@ -9,9 +9,11 @@ import {
   CircularProgress,
   Grid,
   Link,
-  Paper
+  Paper,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
+import { CheckCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 
 const Register = () => {
@@ -40,6 +42,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Validation functions
   const validateName = (name) => {
@@ -357,12 +361,25 @@ const Register = () => {
                 fullWidth
                 label="Password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.password && !!errors.password}
                 helperText={touched.password ? errors.password : 'Min 8 chars, 1 uppercase, 1 lowercase, 1 number'}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: errors.password && touched.password ? '#d32f2f' : '#E0E0E0' },
@@ -377,12 +394,25 @@ const Register = () => {
                 fullWidth
                 label="Confirm Password"
                 name="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? 'text' : 'password'}
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.confirmPassword && !!errors.confirmPassword}
                 helperText={touched.confirmPassword && errors.confirmPassword}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle confirm password visibility"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: errors.confirmPassword && touched.confirmPassword ? '#d32f2f' : '#E0E0E0' },

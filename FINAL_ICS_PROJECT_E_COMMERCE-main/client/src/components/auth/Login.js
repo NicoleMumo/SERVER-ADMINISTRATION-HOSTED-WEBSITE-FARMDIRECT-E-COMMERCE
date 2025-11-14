@@ -9,9 +9,11 @@ import {
   CircularProgress,
   Grid,
   Link,
-  Paper
+  Paper,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
-import { CheckCircle } from '@mui/icons-material';
+import { CheckCircle, Visibility, VisibilityOff } from '@mui/icons-material';
 import axios from 'axios';
 
 const Login = () => {
@@ -21,8 +23,9 @@ const Login = () => {
   const [touched, setTouched] = useState({ email: false, password: false });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Validation functions
+  //Input Validation functions
   const validateEmail = (email) => {
     if (!email) {
       return 'Email is required';
@@ -217,12 +220,25 @@ const Login = () => {
                 fullWidth
                 label="Password"
                 name="password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 value={formData.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 error={touched.password && !!errors.password}
                 helperText={touched.password && errors.password}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     '& fieldset': { borderColor: errors.password && touched.password ? '#d32f2f' : '#E0E0E0' },

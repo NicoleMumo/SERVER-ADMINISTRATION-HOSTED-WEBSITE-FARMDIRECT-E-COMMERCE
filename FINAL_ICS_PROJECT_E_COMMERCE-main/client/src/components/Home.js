@@ -162,7 +162,7 @@ const Home = () => {
           },
         }}
       >
-        <Box sx={{ position: 'relative', zIndex: 1, pt: 16, pb: 12 }}>
+        <Box sx={{ position: 'relative', zIndex: 1, pt: 24, pb: 12 }}>
           <Typography variant="h2" component="h1" sx={{ fontWeight: 'bold', color: '#FFFFFF', mb: 2 }}>
             Fresh From Our Farms, Straight to Your Table
           </Typography>

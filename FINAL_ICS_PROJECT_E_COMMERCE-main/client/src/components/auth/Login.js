@@ -17,18 +17,82 @@ import axios from 'axios';
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [touched, setTouched] = useState({ email: false, password: false });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Validation functions
+  const validateEmail = (email) => {
+    if (!email) {
+      return 'Email is required';
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    return '';
+  };
+
+  const validatePassword = (password) => {
+    if (!password) {
+      return 'Password is required';
+    }
+    if (password.length < 6) {
+      return 'Password must be at least 6 characters long';
+    }
+    return '';
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    
+    let error = '';
+    if (name === 'email') {
+      error = validateEmail(value);
+    } else if (name === 'password') {
+      error = validatePassword(value);
+    }
+    
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     setError('');
+    
+    // Real-time validation if field has been touched
+    if (touched[name]) {
+      let error = '';
+      if (name === 'email') {
+        error = validateEmail(value);
+      } else if (name === 'password') {
+        error = validatePassword(value);
+      }
+      setErrors((prev) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {
+      email: validateEmail(formData.email),
+      password: validatePassword(formData.password),
+    };
+    setErrors(newErrors);
+    setTouched({ email: true, password: true });
+    return !newErrors.email && !newErrors.password;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
     try {
       const response = await axios.post('/api/auth/login', formData);
@@ -136,11 +200,14 @@ const Login = () => {
                 type="email"
                 value={formData.email}
                 onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.email && !!errors.email}
+                helperText={touched.email && errors.email}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#E0E0E0' },
-                    '&:hover fieldset': { borderColor: '#4CAF50' },
-                    '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                    '& fieldset': { borderColor: errors.email && touched.email ? '#d32f2f' : '#E0E0E0' },
+                    '&:hover fieldset': { borderColor: errors.email && touched.email ? '#d32f2f' : '#4CAF50' },
+                    '&.Mui-focused fieldset': { borderColor: errors.email && touched.email ? '#d32f2f' : '#4CAF50' },
                   },
                 }}
               />
@@ -153,11 +220,14 @@ const Login = () => {
                 type="password"
                 value={formData.password}
                 onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && !!errors.password}
+                helperText={touched.password && errors.password}
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    '& fieldset': { borderColor: '#E0E0E0' },
-                    '&:hover fieldset': { borderColor: '#4CAF50' },
-                    '&.Mui-focused fieldset': { borderColor: '#4CAF50' },
+                    '& fieldset': { borderColor: errors.password && touched.password ? '#d32f2f' : '#E0E0E0' },
+                    '&:hover fieldset': { borderColor: errors.password && touched.password ? '#d32f2f' : '#4CAF50' },
+                    '&.Mui-focused fieldset': { borderColor: errors.password && touched.password ? '#d32f2f' : '#4CAF50' },
                   },
                 }}
               />
